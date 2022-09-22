@@ -6,7 +6,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.paginator import Paginator
 
-from .constants import GROUP_PER_PAGE_LIMIT, INDEX_PER_PAGE_LIMIT, PROFILE_PER_PAGE_LIMIT
+from .constants import GROUP_PER_PAGE_LIMIT, INDEX_PER_PAGE_LIMIT,\
+    PROFILE_PER_PAGE_LIMIT
 from .forms import PostForm
 from .models import Group, Post, User
 
