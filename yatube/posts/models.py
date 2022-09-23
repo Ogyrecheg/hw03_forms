@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from .constants import POST_STR_LIM, GROUP_STR_LIM
+
 User = get_user_model()
 
 
@@ -27,14 +29,14 @@ class Post(models.Model):
         verbose_name='группа постов',
     )
 
-    def __str__(self):
-        """Метод, позволяющий получить text объекта"""
-        return self.text
-
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
+
+    def __str__(self):
+        """Метод, позволяющий получить text объекта"""
+        return self.text[:POST_STR_LIM]
 
 
 class Group(models.Model):
@@ -46,4 +48,4 @@ class Group(models.Model):
 
     def __str__(self):
         """Метод, позволяющий получить title объекта Group."""
-        return self.title
+        return self.title[:GROUP_STR_LIM]

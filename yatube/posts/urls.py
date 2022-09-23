@@ -11,5 +11,4 @@ urlpatterns = [
     path('posts/<int:post_id>/edit/', views.post_edit, name='post_edit'),
     path('create/', views.post_create, name='post_create'),
     path('group/<slug:slug>/', views.group_posts, name='group_list'),
-
 ]

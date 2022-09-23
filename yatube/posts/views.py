@@ -4,21 +4,19 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.core.paginator import Paginator
 
-from .constants import GROUP_PER_PAGE_LIMIT, INDEX_PER_PAGE_LIMIT,\
-    PROFILE_PER_PAGE_LIMIT
 from .forms import PostForm
 from .models import Group, Post, User
+from .utils import paginator_func
+from .constants import (GROUP_PER_PAGE_LIMIT, INDEX_PER_PAGE_LIMIT,
+                        PROFILE_PER_PAGE_LIMIT)
 
 
 def index(request: HttpRequest) -> HttpResponse:
     posts: QuerySet = Post.objects.select_related(
         'group', 'author',
     ).all()
-    paginator = Paginator(posts, INDEX_PER_PAGE_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator_func(posts, INDEX_PER_PAGE_LIMIT, request)
     context: Dict[str, QuerySet] = {
         'page_obj': page_obj,
     }
@@ -29,9 +27,7 @@ def index(request: HttpRequest) -> HttpResponse:
 def group_posts(request: HttpRequest, slug: Any) -> HttpResponse:
     group: Type[Group] = get_object_or_404(Group, slug=slug)
     posts: QuerySet = group.posts.all()
-    paginator = Paginator(posts, GROUP_PER_PAGE_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator_func(posts, GROUP_PER_PAGE_LIMIT, request)
     context: Dict[str, Union[Type[Group], QuerySet]] = {
         'group': group,
         'page_obj': page_obj,
@@ -43,9 +39,7 @@ def group_posts(request: HttpRequest, slug: Any) -> HttpResponse:
 def profile(request, username):
     user = User.objects.get(username=username)
     posts = user.posts.all()
-    paginator = Paginator(posts, PROFILE_PER_PAGE_LIMIT)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator_func(posts, PROFILE_PER_PAGE_LIMIT, request)
     context = {
         'author': user,
         'page_obj': page_obj,
@@ -68,7 +62,9 @@ def post_create(request):
         new_post = form.save(commit=False)
         new_post.author = request.user
         new_post.save()
+
         return redirect('posts:profile', request.user.username)
+
     context = {
         'form': form,
     }
@@ -80,15 +76,19 @@ def post_create(request):
 def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if post.author.username != request.user.username:
+
         return redirect('posts:post_detail', post_id)
 
     form = PostForm(request.POST or None, instance=post)
     if form.is_valid():
         form.save()
+
         return redirect('posts:post_detail', post_id)
+
     context = {
         'form': form,
         'is_edit': True,
         'post_id': post_id,
     }
+
     return render(request, 'posts/create_post.html', context)
