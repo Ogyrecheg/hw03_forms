@@ -37,21 +37,25 @@ def group_posts(request: HttpRequest, slug: Any) -> HttpResponse:
 
 
 def profile(request, username):
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
     posts = user.posts.all()
     page_obj = paginator_func(posts, PROFILE_PER_PAGE_LIMIT, request)
     context = {
         'author': user,
         'page_obj': page_obj,
     }
+
     return render(request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
-    context = {
-        'post': post,
-    }
+    context = {}
+    if post.author.username == request.user.username:
+        context['is_edit'] = True
+
+    context['post'] = post
+
     return render(request, 'posts/post_detail.html', context)
 
 

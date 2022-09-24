@@ -18,8 +18,8 @@
             </li>
           </ul>
           <p>{{ post.text|linebreaksbr }}</p>
+          <a href="{% url 'posts:post_detail' post.id %}">подробная информация</a>
         </article>
-        <a href="{% url 'posts:post_detail' post.id %}">подробная информация</a>
     {% if not forloop.last %}<hr>{% endif %}
 {% endfor %}
     {% include 'posts/includes/paginator.html' %}

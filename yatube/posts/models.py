@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .constants import POST_STR_LIM, GROUP_STR_LIM
+from .constants import POST_STR_LIM
 
 User = get_user_model()
 
@@ -48,4 +48,4 @@ class Group(models.Model):
 
     def __str__(self):
         """Метод, позволяющий получить title объекта Group."""
-        return self.title[:GROUP_STR_LIM]
+        return self.title
